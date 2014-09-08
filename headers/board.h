@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <string>
+#include <cmath>
 
 /*
 	The board class stores the states of the board and provides a way to interact with 
@@ -19,15 +20,27 @@ class Board {
  	 * Constructor for the Board class. 
  	 * @param {string} input The user input
  	 */
-    explicit Board(const std::string &input) : input_string_(input) {}
+    explicit Board(const std::string &input) : input_string_(input),
+      memory_allocated_(false), moves_made_(0),
+      est_moves_remaining_(0), previous_state_(NULL) {}
 
     /*
      * Destructor for the Board class. Deallocates dyanmically created memory.
      */
-    ~Board() {
-        this->destroy_board();
-        this->board = NULL;
-    }
+    ~Board() {this->DestroyBoard_();}
+
+    /*
+     * Allocates memory and initializes the board. 
+     * Must be called after making a new board instance.
+     * @return {boolean} true if allocation successful, false otherwise.
+     */
+    bool CreateBoard();
+
+    /*
+     * Calculates the sum of all manhattan distances of every piece on the board.
+     * This is the heuristic function used for the A* algorithm.
+     */
+    int SumManhattanDistances();
 
 
 
@@ -35,18 +48,18 @@ class Board {
     /* The input string given by the user. */
     const std::string input_string_;
     /* Flag to store when memory is allocated. */
-    bool memory_allocated_   = false;
+    bool memory_allocated_;
     /* Representation of a board as a dynamically allocated 2-D array */
-    int** board_[3][3]       = NULL;
+    int** board_;
     /* Actual number of moves made so far */
-    int moves_made_          = 0;
+    int moves_made_;
     /* Estimated moves remaining, using heuristic function. */
-    int est_moves_remaining_ = 0;
+    int est_moves_remaining_;
     /* A pointer to the previous board state. */
-    Board* previous_state_   = NULL;
+    Board* previous_state_;
 
     /* Free dynamically allocated memory for board. */
-    void destroy_board();
+    void DestroyBoard_();
 };
 
 
