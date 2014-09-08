@@ -39,7 +39,7 @@ bool Board::CreateBoard() {
  */
 void Board::PrintBoard() {
     // If the board hasn't been allocated, then can't print it.
-    if (!this->memory_allocated_) {
+    if (!this->board_) {
         std::cerr << "No board. Please make sure CreateBoard has been called.";
         std::cerr << std::endl;
         return;
@@ -62,7 +62,7 @@ void Board::PrintBoard() {
  * @return {int} The sum of the manhattan distances of all the tiles.
  */
 int Board::GetHeuristicValue() {
-    if (!this->memory_allocated_ || this->est_moves_remaining_ == -1) {
+    if (!this->board_ || this->est_moves_remaining_ == -1) {
         std::cerr << "No board. Please make sure CreateBoard has been called.";
         std::cerr << std::endl;
         return -1;
@@ -79,13 +79,12 @@ int Board::GetHeuristicValue() {
  * @private
  */
 void Board::DestroyBoard_() {
-    if (this->memory_allocated_) {
+    if (this->board_) {
         for (int i = 0; i < 3; ++i) {
             delete [] this->board_[i];
             this->board_[i] = NULL;
         }
         delete [] this->board_;
-        this->memory_allocated_ = false;
         this->board_ = NULL;
     }
 }
@@ -97,7 +96,7 @@ void Board::DestroyBoard_() {
  */
 bool Board::AllocateBoard_() {
     // Check if memory has already been allocated.
-    if (memory_allocated_) {
+    if (this->board_) {
         std::cerr << "ERROR: Memory has already been allocated" << std::endl;
         return false;
     }
@@ -105,7 +104,6 @@ bool Board::AllocateBoard_() {
         this->board_ = new int*[3];
         for (int i = 0; i < 3; ++i)
             this->board_[i] = new int[3];
-        this->memory_allocated_ = true;
         return true;
     }
     catch(std::bad_alloc exc) {

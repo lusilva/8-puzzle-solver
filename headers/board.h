@@ -20,8 +20,8 @@ class Board {
  	 * @param {string} input The user input
  	 */
     explicit Board(const std::string &input) : input_string_(input),
-      memory_allocated_(false), moves_made_(0),
-      est_moves_remaining_(-1), previous_state_(NULL), board_(NULL) {}
+      moves_made_(0), est_moves_remaining_(-1), previous_state_(NULL),
+      board_(NULL) {}
 
     /*
      * Destructor for the Board class. Deallocates dyanmically created memory.
@@ -57,8 +57,6 @@ class Board {
  private:
     /* The input string given by the user. */
     const std::string input_string_;
-    /* Flag to store when memory is allocated. */
-    bool memory_allocated_;
     /* Representation of a board as a dynamically allocated 2-D array */
     int** board_;
     /* Actual number of moves made so far */
