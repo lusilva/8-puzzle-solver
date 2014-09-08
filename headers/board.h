@@ -60,6 +60,9 @@ class Board {
 
     /* Free dynamically allocated memory for board. */
     void DestroyBoard_();
+
+    /* Allocates dynamic memory used to store the board. */
+    bool AllocateBoard_();
 };
 
 
