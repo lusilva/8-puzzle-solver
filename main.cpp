@@ -8,10 +8,10 @@
 #include "headers/board.h"
 
 int main() {
-    Board board = Board("0 1 2 3 4 5 6 7 8");
-    std::cout << board.GetInputString() << std::endl;
+    Board board = Board("1 0 2 3 4 5 6 7 8");
     if (board.CreateBoard()) {
-        std::cout << "Hello!" << std::endl;
+        board.PrintBoard();
+        std::cout << board.GetHeuristicValue() << std::endl;
     }
     return 1;
 }

@@ -21,7 +21,7 @@ class Board {
  	 */
     explicit Board(const std::string &input) : input_string_(input),
       memory_allocated_(false), moves_made_(0),
-      est_moves_remaining_(0), previous_state_(NULL) {}
+      est_moves_remaining_(-1), previous_state_(NULL), board_(NULL) {}
 
     /*
      * Destructor for the Board class. Deallocates dyanmically created memory.
@@ -41,11 +41,16 @@ class Board {
      */
     bool CreateBoard();
 
-    /*
-     * Calculates the sum of all manhattan distances of every piece on the board.
-     * This is the heuristic function used for the A* algorithm.
+    /**
+     * Prints the board.
      */
-    int SumManhattanDistances();
+    void PrintBoard();
+
+    /**
+     * Gets the value of the heuristic function.
+     * @return {int} The sum of the manhattan distances of all the tiles.
+     */
+    int GetHeuristicValue();
 
 
 
@@ -70,7 +75,20 @@ class Board {
     bool AllocateBoard_();
 
     /* Removes all spaces from input string */
-    std::string TrimSpaceFromInputString();
+    std::string TrimSpaceFromInputString_();
+
+    /*
+     * Calculates the sum of all manhattan distances of every piece on the board.
+     * This is the heuristic function used for the A* algorithm.
+     */
+    int CalculateSumOfManhattanDistances_();
+
+    /**
+     * Recalculates the heuristic function, which estimates how many
+     *   moves remain to get to goal state.
+     *   Also sets est_moves_remaining_;
+     */
+    int CalculateAndSetHeuristic_();
 };
 
 
