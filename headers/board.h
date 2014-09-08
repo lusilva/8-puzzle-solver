@@ -8,7 +8,6 @@
 
 #include <iostream>
 #include <string>
-#include <cmath>
 
 /*
 	The board class stores the states of the board and provides a way to interact with 
@@ -28,6 +27,12 @@ class Board {
      * Destructor for the Board class. Deallocates dyanmically created memory.
      */
     ~Board() {this->DestroyBoard_();}
+
+    /**
+     * Gets the input string used to create the table.
+     * @return {string} the input string
+     */
+    std::string GetInputString() {return this->input_string_;}
 
     /*
      * Allocates memory and initializes the board. 
@@ -63,6 +68,9 @@ class Board {
 
     /* Allocates dynamic memory used to store the board. */
     bool AllocateBoard_();
+
+    /* Removes all spaces from input string */
+    std::string TrimSpaceFromInputString();
 };
 
 

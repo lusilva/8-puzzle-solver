@@ -3,6 +3,10 @@
 // The implementation file for the board class //
 /////////////////////////////////////////////////
 
+#include <string>
+#include <cmath>
+#include <algorithm>
+
 #include "headers/board.h"
 
 /**
@@ -11,14 +15,20 @@
   * @return {boolean} true if allocation successful, false otherwise.
   */
 bool Board::CreateBoard() {
+    // Try to allocate board, if it fails then return false.
     if (!this->AllocateBoard_()) {return false;}
-    if (this->input_string_.length() != 9) {
-        std::cerr << "ERROR: Invalid input. Need 9 tiles.";
+    // Make sure input string is valid.
+    std::string input = this->TrimSpaceFromInputString();
+    if (input.length() != 9) {
+        std::cerr << "ERROR: Invalid input. Need 9 tiles." << std::endl;
+        this->DestroyBoard_();
         return false;
     }
-    for (int tile = 0; tile < this->input_string_.length(); tile++) {
-        this->board_[tile/3][tile%3] = this->input_string_[tile];
+    // Actually fill in the tile values.
+    for (int tile = 0; tile < input.length(); tile++) {
+        this->board_[tile/3][tile%3] = input[tile];
     }
+    return true;
 }
 
 /**
@@ -39,6 +49,7 @@ int Board::SumManhattanDistances() {
             }
         }
     }
+    return manhattanDistanceSum;
 }
 
 //////////////////////////////
@@ -65,8 +76,9 @@ void Board::DestroyBoard_() {
  * @return {boolean} true if allocation successful, false otherwise.
  */
 bool Board::AllocateBoard_() {
+    // Check if memory has already been allocated.
     if (memory_allocated_) {
-        std::cerr << "ERROR: Memory has already been allocated";
+        std::cerr << "ERROR: Memory has already been allocated" << std::endl;
         return false;
     }
     try {
@@ -77,7 +89,18 @@ bool Board::AllocateBoard_() {
         return true;
     }
     catch(std::bad_alloc exc) {
-        std::cerr << "ERROR: Memory allocation failed";
+        std::cerr << "ERROR: Memory allocation failed" << std::endl;
         return false;
     }
+}
+
+std::string Board::TrimSpaceFromInputString() {
+    std::string str = this->input_string_;
+    for (size_t i = 0; i < str.length(); i++) {
+        if (str[i] == ' ' || str[i] == '\n' || str[i] == '\t') {
+            str.erase(i, 1);
+            i--;
+        }
+    }
+    return str;
 }
