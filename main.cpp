@@ -3,7 +3,6 @@
 // The main file in the program                //
 /////////////////////////////////////////////////
 
-// TODO(Lucas): Implement priority queue and A*
 // TODO(lucas): Implement IO
 
 #include <iostream>
@@ -39,7 +38,7 @@ class QueueCompareClass {
  * @param  board The board to be checked.
  * @return true if a move in that direction is possible.
  */
-bool CanMoveInDirection(int direction, const Board* &board) {
+bool CanMoveInDirection(int direction, Board* &board) {
     switch (direction) {
         case RIGHT:
             return board->CanMoveRight();
@@ -80,7 +79,7 @@ bool MoveInDirection(int direction, Board* &board) {
  * @param board The board to be moved.
  * @param queue The priority queue holding all board states.
  */
-std::pair<bool, Board*> MoveAllDirectionsAndAddToQueue(const Board* &board,
+std::pair<bool, Board*> MoveAllDirectionsAndAddToQueue(Board* &board,
     std::priority_queue<Board*, std::vector<Board*>, QueueCompareClass> &queue) {
 
     // For all 4 directions, try to move in that direction.
@@ -112,44 +111,71 @@ std::pair<bool, Board*> MoveAllDirectionsAndAddToQueue(const Board* &board,
     return std::make_pair(false, reinterpret_cast<Board*>(NULL));
 }
 
+Board* Solve(std::priority_queue<Board*, std::vector<Board*>,
+    QueueCompareClass> &pq) {
+    // While the board isn't empty, try to find the solution.
+    while (!pq.empty()) {
+        // Get the board with least rank from the top of the queue.
+        // Rank = moves made so far + estimated number of moves remaining
+        Board* board = pq.top();
+        pq.pop();
+
+        // Move in all directions, adding the boards to the queue.
+        std::pair<bool, Board*> result =
+          MoveAllDirectionsAndAddToQueue(board, pq);
+
+        // If the goal state has been reached, then we are done!
+        if (result.first) {
+            return result.second;
+        }
+
+        delete board;
+        board = NULL;
+    }
+
+    // No goal state was found!
+    reinterpret_cast<Board*>(NULL);
+}
+
+void Cleanup(std::priority_queue<Board*, std::vector<Board*>,
+    QueueCompareClass> &pq) {
+    while (!pq.empty()) {
+        Board* board = pq.top();
+        pq.pop();
+        delete board;
+        board = NULL;
+    }
+}
+
 ///////////////////
 // Start of main //
 ///////////////////
 
 int main() {
+    // The priority queue to hold all the board states.
     std::priority_queue<Board*, std::vector<Board*>, QueueCompareClass> pq;
 
-    Board* board = new Board("1 0 2 3 4 5 6 7 8");
+    // Create a board object from the input string.
+    Board* board = new Board("0 1 3 4 2 5 7 8 6");
     if (board->CreateBoard()) {
+        // Add the board to the queue.
         pq.push(board);
-        std::cout << "INITIAL BOARD" << std::endl;
-        board->PrintBoard();
+    } else {
+        std::cerr << "Board could not be created!" << std::endl;
+        return 1;
     }
-    Board* new_board = new Board(*board);
 
-    while (!pq.empty()) {
-        const Board* board = pq.top();
-        pq.pop();
-
-        std::pair<bool, Board*> result =
-          MoveAllDirectionsAndAddToQueue(board, pq);
-
-        if (result.first) {
-            std::cout << "DONE!" << std::endl;
-            result.second->PrintBoard();
-            break;
-        }
-
-        delete board;
+    Board* answer = Solve(pq);
+    if (!answer) {
+        std::cout << "COULD NOT FIND SOLUTION" << std::endl;
+        return 1;
     }
+
+    answer->DisplayAllSteps();
 
     // TODO(lucas): Display all the moves that were made.
 
-    while (!pq.empty()) {
-        Board* board = pq.top();
-        pq.pop();
-        delete board;
-    }
+    Cleanup(pq);
 
 
     return 0;

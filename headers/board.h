@@ -61,7 +61,7 @@ class Board {
      * Gets a pointer to the previous board state.
      * @return {Board*} the previous state.
      */
-    const Board* GetPreviousState() const {return this->previous_state_;}
+    Board* GetPreviousState() {return this->previous_state_;}
 
     /**
      * Gets the position of empty space as a pair of coordinates.
@@ -130,6 +130,11 @@ class Board {
     void PrintBoard() const;
 
     /**
+     * Displays all the previous board states, in order.
+     */
+    void DisplayAllSteps();
+
+    /**
      * Gets the value of the heuristic function.
      * @return {int} The sum of the manhattan distances of all the tiles.
      */
@@ -192,7 +197,7 @@ class Board {
 
  private:
     /* The input string given by the user. */
-    const std::string input_string_;
+    std::string input_string_;
     /* Representation of a board as a dynamically allocated 2-D array */
     int** board_;
     /* (X,Y) position of the empty space on the board */

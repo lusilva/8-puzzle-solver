@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <utility>
 #include <cassert>
+#include <vector>
 
 #include "headers/board.h"
 
@@ -22,19 +23,16 @@
  */
 Board::Board(const Board& board) {
     assert(board.IsValid());
-    bool success;
 
     try {
         this->board_ = new int*[3];
         for (int i = 0; i < 3; ++i)
             this->board_[i] = new int[3];
-        success = true;
     }
     catch(std::bad_alloc exc) {
         std::cerr << "ERROR: Memory allocation failed" << std::endl;
-        success = false;
+        exit(1);
     }
-    assert(success);
 
     for (int x = 0; x < 3; ++x) {
         for (int y = 0; y < 3; ++y) {
@@ -45,6 +43,8 @@ Board::Board(const Board& board) {
     this->moves_made_ = board.moves_made_;
     this->estimated_moves_remaining_ = board.estimated_moves_remaining_;
     this->previous_state_ = board.previous_state_;
+
+    assert(this->board_);
 }
 
 
@@ -58,11 +58,11 @@ Board::Board(const Board& board) {
 const int Board::GetValueAt(int x, int y) const {
     if (!this->board_) {
         std::cerr << "ERROR: Board has not been initialized yet.\n";
-        return -1;
+        exit(1);
     }
     if (x > 2 || x < 0 || y > 2 || y < 0) {
         std::cerr << "ERROR: Coordinates out of range. \n";
-        return -1;
+        exit(1);
     }
     return this->board_[x][y];
 }
@@ -134,6 +134,36 @@ void Board::PrintBoard() const {
         std::cout << "|\n";
     }
     std::cout << "-----------" << std::endl;
+}
+
+/**
+ * Displays all the previous board states, in order.
+ */
+void Board::DisplayAllSteps() {
+    // Vector to hold all the board states
+    std::vector<Board*> all_boards;
+
+    // Add all the board states to the vector, in reverse order.
+    Board* board = this;
+    while (board) {
+        all_boards.push_back(board);
+        board = board->GetPreviousState();
+    }
+
+    // Quick check to make sure the size of the vector is correct.
+    assert(all_boards.size() == this->moves_made_ + 1);
+
+    int number_of_boards = all_boards.size() - 1;
+    for (int i = number_of_boards; i > -1; --i) {
+        if (number_of_boards - i == 0) {
+            std::cout << "INITIAL BOARD" << std::endl;
+        } else if (i == 0) {
+            std::cout << "GOAL STATE" << std::endl;
+        } else {
+            std::cout << "STEP: " << number_of_boards << std::endl;
+        }
+        all_boards[i]->PrintBoard();
+    }
 }
 
 /**
@@ -345,6 +375,7 @@ void Board::Swap_(std::pair<int, int> point_1, std::pair<int, int> point_2) {
     assert(point_1.second < 3 && point_1.second >= 0);
     assert(point_2.first < 3 && point_2.first >= 0);
     assert(point_2.second < 3 && point_2.second >= 0);
+    
     int value_at_point_1 = this->GetValueAt(point_1.first, point_1.second);
     int value_at_point_2 = this->GetValueAt(point_2.first, point_2.second);
     this->board_[point_1.first][point_1.second] = value_at_point_2;
@@ -386,6 +417,11 @@ void Board::Move_(int direction) {
     this->moves_made_ = this->moves_made_ + 1;
     this->empty_space_position_ = next_position;
     this->CalculateAndSetHeuristic_();
+
+    std::cout << "PREVIOUS!" << std::endl;
+    this->previous_state_->PrintBoard();
+    std::cout << "CURRENT" << std::endl;
+    this->PrintBoard();
 }
 
 //////////////////////////
