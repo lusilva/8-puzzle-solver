@@ -149,15 +149,39 @@ int Board::GetHeuristicValue() {
     return this->CalculateAndSetHeuristic_();
 }
 
+
+/**
+ * Determine whether a move to the right is possible.
+ * @return {boolean} true if possible.
+ */
+bool Board::CanMoveRight() {
+    if (this->GetEmptySpaceColumn() >= 2) {
+        return false;
+    }
+    return true;
+}
+
+
 /**
  * Moves the empty space to the right.
  * @return {boolean} true if the move was successful, false otherwise.
  */
 bool Board::MoveRight() {
-    if (this->GetEmptySpaceColumn() >= 2) {
+    if (this->CanMoveRight()) {
         return false;
     }
     this->Move_(RIGHT);
+    return true;
+}
+
+/**
+ * Determine whether a move to the left is possible.
+ * @return {boolean} true if possible.
+ */
+bool Board::CanMoveLeft() {
+    if (this->GetEmptySpaceColumn() <= 0) {
+        return false;
+    }
     return true;
 }
 
@@ -166,10 +190,21 @@ bool Board::MoveRight() {
  * @return {boolean} true if the move was successful, false otherwise.
  */
 bool Board::MoveLeft() {
-    if (this->GetEmptySpaceColumn() <= 0) {
+    if (this->CanMoveLeft()) {
         return false;
     }
     this->Move_(LEFT);
+    return true;
+}
+
+/**
+ * Determine whether a move down is possible.
+ * @return {boolean} true if possible.
+ */
+bool Board::CanMoveDown() {
+    if (this->GetEmptySpaceRow() >= 2) {
+        return false;
+    }
     return true;
 }
 
@@ -178,10 +213,21 @@ bool Board::MoveLeft() {
  * @return {boolean} true if the move was successful, false otherwise.
  */
 bool Board::MoveDown() {
-    if (this->GetEmptySpaceRow() >= 2) {
+    if (this->CanMoveDown()) {
         return false;
     }
     this->Move_(DOWN);
+    return true;
+}
+
+/**
+ * Determine whether a move up is possible.
+ * @return {boolean} true if possible.
+ */
+bool Board::CanMoveUp() {
+    if (this->GetEmptySpaceRow() <= 0) {
+        return false;
+    }
     return true;
 }
 
@@ -190,7 +236,7 @@ bool Board::MoveDown() {
  * @return {boolean} true if the move was successful, false otherwise.
  */
 bool Board::MoveUp() {
-    if (this->GetEmptySpaceRow() <= 0) {
+    if (this->CanMoveUp()) {
         return false;
     }
     this->Move_(UP);
@@ -359,6 +405,6 @@ bool operator==(const Board& lhs, const Board& rhs) {
 }
 
 // TODO(Lucas): Deal with ties in rank.
-bool operator<(const *Board const &lhs, const *Board const &rhs) {
-    return lhs->GetRank() < rhs.GetRank();
+bool operator<(const Board &lhs, const Board &rhs) {
+    return lhs.GetRank() > rhs.GetRank();
 }

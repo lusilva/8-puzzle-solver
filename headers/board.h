@@ -135,11 +135,24 @@ class Board {
     // it is the responsibility of the caller to delete them     //
     ///////////////////////////////////////////////////////////////
 
+
+    /**
+     * Determine whether a move to the right is possible.
+     * @return {boolean} true if possible.
+     */
+    bool CanMoveRight();
+
     /**
      * Moves the empty space to the right.
      * @return {boolean} true if the move was successful, false otherwise.
      */
     bool MoveRight();
+
+    /**
+     * Determine whether a move to the left is possible.
+     * @return {boolean} true if possible.
+     */
+    bool CanMoveLeft();
 
     /**
      * Moves the empty space to the left.
@@ -148,10 +161,22 @@ class Board {
     bool MoveLeft();
 
     /**
+     * Determine whether a move down is possible.
+     * @return {boolean} true if possible.
+     */
+    bool CanMoveDown();
+
+    /**
      * Moves the empty space down.
      * @return {boolean} true if the move was successful, false otherwise.
      */
     bool MoveDown();
+
+    /**
+     * Determine whether a move up is possible.
+     * @return {boolean} true if possible.
+     */
+    bool CanMoveUp();
 
     /**
      * Moves the empty space up.
@@ -228,12 +253,12 @@ class Board {
 bool operator==(const Board &lhs, const Board &rhs);
 
 /**
- * Overloaded less than operator, takes in two pointers. 
- * @param {*Board} lhs The left hand side of the <
- * @param {*Board} rhs The right hand side of the <
+ * Overloaded less than operator. 
+ * @param {Board} lhs The left hand side of the <
+ * @param {Board} rhs The right hand side of the <
  * @return {boolean} true if overall rank of the board on the left
  *   is less than the one on the right. (using GetRank())
  */
-bool operator<(const *Board const &lhs, const *Board const &rhs);
+bool operator<(const Board &lhs, const Board &rhs);
 
 #endif
