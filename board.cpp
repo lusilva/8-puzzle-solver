@@ -1,13 +1,34 @@
-/////////////////////////////////////////////////
-// Copyright 2014 Lucas Silva                  //
+/////////////////////////////////////////////////                //
 // The implementation file for the board class //
 /////////////////////////////////////////////////
 
-#include <string>
+#include <iostream>
 #include <cmath>
+#include <string>
 #include <algorithm>
+#include <utility>
 
 #include "headers/board.h"
+
+/**
+ * Returns the value of the tile at board[x][y].
+ * Retuns -1 if board hasn't been initialized yet.
+ * @param {int} x The x coordinate of the point. 
+ * @param {int} y The y coordinate of the point.
+ * @return {int} The value of the tile at those coordinates.
+ */
+const int Board::GetValueAt(int x, int y) {
+    if (!this->board_) {
+        std::cerr << "ERROR: Board has not been initialized yet.\n";
+        return -1;
+    }
+    if (x > 2 || x < 0 || y > 2 || y < 0) {
+        std::cerr << "ERROR: Coordinates out of range. \n";
+        return -1;
+    }
+    return this->board_[x][y];
+}
+
 
 /**
   * Allocates memory and initializes the board. 
@@ -27,7 +48,17 @@ bool Board::CreateBoard() {
     // Actually fill in the tile values.
     for (int tile = 0; tile < input.length(); tile++) {
         // Convert the char to int and set it to that position in board.
-        this->board_[tile/3][tile%3] = input[tile] - '0';
+        int tile_number = input[tile] - '0';
+        if (tile_number < 0 || tile_number > 8) {
+            std::cerr << "ERROR: Tiles are only valid in range 0-8 \n";
+            this->DestroyBoard_();
+            return false;
+        }
+        this->board_[tile/3][tile%3] = tile_number;
+        // If this is the empty space, store its current position on the board.
+        if (tile_number == 0) {
+            this->empty_space_position_ = std::make_pair(tile/3, tile%3);
+        }
     }
     // Initialize the heuristic value.
     this->CalculateAndSetHeuristic_();
@@ -40,7 +71,7 @@ bool Board::CreateBoard() {
 void Board::PrintBoard() {
     // If the board hasn't been allocated, then can't print it.
     if (!this->board_) {
-        std::cerr << "No board. Please make sure CreateBoard has been called.";
+        std::cerr << "ERROR: Please make sure CreateBoard has been called.";
         std::cerr << std::endl;
         return;
     }
@@ -62,7 +93,7 @@ void Board::PrintBoard() {
  * @return {int} The sum of the manhattan distances of all the tiles.
  */
 int Board::GetHeuristicValue() {
-    if (!this->board_ || this->est_moves_remaining_ == -1) {
+    if (!this->board_ || this->estimated_moves_remaining_ == -1) {
         std::cerr << "No board. Please make sure CreateBoard has been called.";
         std::cerr << std::endl;
         return -1;
@@ -154,10 +185,22 @@ int Board::CalculateSumOfManhattanDistances_() {
 /**
  * Recalculates the heuristic function, which estimates how many
  *   moves remain to get to goal state.
- *   Also sets est_moves_remaining_;
+ *   Also sets estimated_moves_remaining_;
+ * @private
+ * @return {int} The calculated heuristic value.
  */
 int Board::CalculateAndSetHeuristic_() {
     int value = this->CalculateSumOfManhattanDistances_();
-    this->est_moves_remaining_ = value;
+    this->estimated_moves_remaining_ = value;
     return value;
 }
+
+/**
+ * Moves the empty space to the right.
+ * @return {boolean} true if move successful, false otherwise.
+ * @private
+ */
+bool Board::MoveRight_() {
+    return true;
+}
+
