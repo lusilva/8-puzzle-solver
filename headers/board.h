@@ -110,6 +110,12 @@ class Board {
      */
     bool IsValid() const;
 
+    /**
+     * Checks if the board is at the goal state.
+     * @return {boolean} true if board is at goal state.
+     */
+    bool IsAtGoalState() {return this->estimated_moves_remaining_ == 0;}
+
     /*
      * Allocates memory and initializes the board. 
      * Must be called after making a new board instance, because this
@@ -140,7 +146,7 @@ class Board {
      * Determine whether a move to the right is possible.
      * @return {boolean} true if possible.
      */
-    bool CanMoveRight();
+    bool CanMoveRight() const;
 
     /**
      * Moves the empty space to the right.
@@ -152,7 +158,7 @@ class Board {
      * Determine whether a move to the left is possible.
      * @return {boolean} true if possible.
      */
-    bool CanMoveLeft();
+    bool CanMoveLeft() const;
 
     /**
      * Moves the empty space to the left.
@@ -164,7 +170,7 @@ class Board {
      * Determine whether a move down is possible.
      * @return {boolean} true if possible.
      */
-    bool CanMoveDown();
+    bool CanMoveDown() const;
 
     /**
      * Moves the empty space down.
@@ -175,8 +181,8 @@ class Board {
     /**
      * Determine whether a move up is possible.
      * @return {boolean} true if possible.
-     */
-    bool CanMoveUp();
+    */
+    bool CanMoveUp() const;
 
     /**
      * Moves the empty space up.

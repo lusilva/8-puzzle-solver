@@ -154,7 +154,7 @@ int Board::GetHeuristicValue() {
  * Determine whether a move to the right is possible.
  * @return {boolean} true if possible.
  */
-bool Board::CanMoveRight() {
+bool Board::CanMoveRight() const {
     if (this->GetEmptySpaceColumn() >= 2) {
         return false;
     }
@@ -167,7 +167,7 @@ bool Board::CanMoveRight() {
  * @return {boolean} true if the move was successful, false otherwise.
  */
 bool Board::MoveRight() {
-    if (this->CanMoveRight()) {
+    if (!this->CanMoveRight()) {
         return false;
     }
     this->Move_(RIGHT);
@@ -178,7 +178,7 @@ bool Board::MoveRight() {
  * Determine whether a move to the left is possible.
  * @return {boolean} true if possible.
  */
-bool Board::CanMoveLeft() {
+bool Board::CanMoveLeft() const {
     if (this->GetEmptySpaceColumn() <= 0) {
         return false;
     }
@@ -190,7 +190,7 @@ bool Board::CanMoveLeft() {
  * @return {boolean} true if the move was successful, false otherwise.
  */
 bool Board::MoveLeft() {
-    if (this->CanMoveLeft()) {
+    if (!this->CanMoveLeft()) {
         return false;
     }
     this->Move_(LEFT);
@@ -201,7 +201,7 @@ bool Board::MoveLeft() {
  * Determine whether a move down is possible.
  * @return {boolean} true if possible.
  */
-bool Board::CanMoveDown() {
+bool Board::CanMoveDown() const {
     if (this->GetEmptySpaceRow() >= 2) {
         return false;
     }
@@ -213,7 +213,7 @@ bool Board::CanMoveDown() {
  * @return {boolean} true if the move was successful, false otherwise.
  */
 bool Board::MoveDown() {
-    if (this->CanMoveDown()) {
+    if (!this->CanMoveDown()) {
         return false;
     }
     this->Move_(DOWN);
@@ -224,7 +224,7 @@ bool Board::MoveDown() {
  * Determine whether a move up is possible.
  * @return {boolean} true if possible.
  */
-bool Board::CanMoveUp() {
+bool Board::CanMoveUp() const {
     if (this->GetEmptySpaceRow() <= 0) {
         return false;
     }
@@ -236,7 +236,7 @@ bool Board::CanMoveUp() {
  * @return {boolean} true if the move was successful, false otherwise.
  */
 bool Board::MoveUp() {
-    if (this->CanMoveUp()) {
+    if (!this->CanMoveUp()) {
         return false;
     }
     this->Move_(UP);

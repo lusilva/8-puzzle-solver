@@ -9,8 +9,16 @@
 #include <iostream>
 #include <queue>          // std::priority_queue
 #include <vector>         // std::vector
+#include <utility>
 
 #include "headers/board.h"
+
+#define RIGHT 1
+#define LEFT 2
+#define UP 3
+#define DOWN 4
+
+const unsigned int DIRECTIONS[4] = {RIGHT, LEFT, UP, DOWN};
 
 /**
  * The class used to compare the board pointers in the priority queue.
@@ -25,13 +33,83 @@ class QueueCompareClass {
     }
 };
 
-void MoveAllDirectionsAndAddToQueue(const Board* board,
+/**
+ * Determines if a move can be made in the specified direction.
+ * @param  direction One of the four directions.
+ * @param  board The board to be checked.
+ * @return true if a move in that direction is possible.
+ */
+bool CanMoveInDirection(int direction, const Board* &board) {
+    switch (direction) {
+        case RIGHT:
+            return board->CanMoveRight();
+        case LEFT:
+            return board->CanMoveLeft();
+        case UP:
+            return board->CanMoveUp();
+        case DOWN:
+            return board->CanMoveDown();
+    }
+}
+
+/**
+ * Moves the given board in the given direction
+ * @param direction The direction to move in.
+ * @param board     The board to be moved.
+ */
+bool MoveInDirection(int direction, Board* &board) {
+    switch (direction) {
+        case RIGHT:
+            board->MoveRight();
+            break;
+        case LEFT:
+            board->MoveLeft();
+            break;
+        case UP:
+            board->MoveUp();
+            break;
+        case DOWN:
+            board->MoveDown();
+            break;
+    }
+    return true;
+}
+
+/**
+ * Moves a board in all the possible directions and adds the new states to the queue.
+ * @param board The board to be moved.
+ * @param queue The priority queue holding all board states.
+ */
+std::pair<bool, Board*> MoveAllDirectionsAndAddToQueue(const Board* &board,
     std::priority_queue<Board*, std::vector<Board*>, QueueCompareClass> &queue) {
 
-    Board* board_right = new Board(*board);
-    Board* board_left = new Board(*board);
-    Board* board_up = new Board(*board);
-    Board* board_down = new Board(*board);
+    // For all 4 directions, try to move in that direction.
+    for (unsigned int i = 0; i < 4; ++i) {
+        int direction = DIRECTIONS[i];
+        // If the board can move in that direction, then move it.
+        // If it can't, then do nothing.
+        if (CanMoveInDirection(direction, board)) {
+            // Create a copy of the current board, and move the copy.
+            Board* new_board = new Board(*board);
+            // Actually move the board.
+            MoveInDirection(direction, new_board);
+            // Check if the board is at the goal state, if so then stop.
+            if (new_board->IsAtGoalState()) {
+                return std::make_pair(true, new_board);
+            }
+            // Do not add the new state to the queue if the new board is the
+            // same as the previous state.
+            if (board->GetPreviousState() &&
+                *(board->GetPreviousState()) == *new_board) {
+                delete new_board;
+                continue;
+            } else {
+                queue.push(new_board);
+            }
+        }
+    }
+
+    return std::make_pair(false, reinterpret_cast<Board*>(NULL));
 }
 
 ///////////////////
@@ -44,24 +122,35 @@ int main() {
     Board* board = new Board("1 0 2 3 4 5 6 7 8");
     if (board->CreateBoard()) {
         pq.push(board);
+        std::cout << "INITIAL BOARD" << std::endl;
         board->PrintBoard();
-        std::cout << board->GetHeuristicValue() << std::endl;
     }
     Board* new_board = new Board(*board);
 
-    new_board->MoveRight();
-    pq.push(new_board);
-    std::cout << "OLD BOARD" << std::endl;
-    board->PrintBoard();
-    std::cout << "OLD BOARD RANK: " << board->GetRank() << std::endl;
-    std::cout << "NEW BOARD" << std::endl;
-    new_board->PrintBoard();
-    std::cout << "NEW BOARD RANK: " << new_board->GetRank() << std::endl;
+    while (!pq.empty()) {
+        const Board* board = pq.top();
+        pq.pop();
 
-    std::cout << "FIRST POP" << std::endl;
-    pq.top()->PrintBoard();
+        std::pair<bool, Board*> result =
+          MoveAllDirectionsAndAddToQueue(board, pq);
 
-    delete board;
-    delete new_board;
+        if (result.first) {
+            std::cout << "DONE!" << std::endl;
+            result.second->PrintBoard();
+            break;
+        }
+
+        delete board;
+    }
+
+    // TODO(lucas): Display all the moves that were made.
+
+    while (!pq.empty()) {
+        Board* board = pq.top();
+        pq.pop();
+        delete board;
+    }
+
+
     return 0;
 }
