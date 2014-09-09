@@ -3,6 +3,9 @@
 // The main file in the program                //
 /////////////////////////////////////////////////
 
+// TODO(Lucas): Implement priority queue and A*
+// TODO(lucas): Implement IO
+
 #include <iostream>
 
 #include "headers/board.h"

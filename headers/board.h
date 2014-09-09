@@ -92,6 +92,14 @@ class Board {
      */
     const int GetValueAt(int x, int y) const;
 
+    /**
+     * Returns the sum of the actual moves made plus 
+     *   the estimated number of moves remaining.
+     * @return {int} The rank of the board in the A* priority queue.
+     */
+    const int GetRank() const {
+        return this->moves_made_ + this->estimated_moves_remaining_;}
+
     ////////////////////
     // End of getters //
     ////////////////////
@@ -211,6 +219,21 @@ class Board {
     void Move_(int direction);
 };
 
-bool operator==(const Board& lhs, const Board& rhs);
+/**
+ * Overloaded equality operator, takes in two board objects.
+ * @param {Board} lhs The left hand side of the ==
+ * @param {Board} rhs The right hand side of the ==
+ * @return {boolean} true if board states are equal.
+ */
+bool operator==(const Board &lhs, const Board &rhs);
+
+/**
+ * Overloaded less than operator, takes in two pointers. 
+ * @param {*Board} lhs The left hand side of the <
+ * @param {*Board} rhs The right hand side of the <
+ * @return {boolean} true if overall rank of the board on the left
+ *   is less than the one on the right. (using GetRank())
+ */
+bool operator<(const *Board const &lhs, const *Board const &rhs);
 
 #endif

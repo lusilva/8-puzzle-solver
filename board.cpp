@@ -357,3 +357,8 @@ bool operator==(const Board& lhs, const Board& rhs) {
     }
     return true;
 }
+
+// TODO(Lucas): Deal with ties in rank.
+bool operator<(const *Board const &lhs, const *Board const &rhs) {
+    return lhs->GetRank() < rhs.GetRank();
+}
