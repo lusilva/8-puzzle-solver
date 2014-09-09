@@ -7,8 +7,46 @@
 #include <string>
 #include <algorithm>
 #include <utility>
+#include <cassert>
 
 #include "headers/board.h"
+
+#define RIGHT 1
+#define LEFT 2
+#define UP 3
+#define DOWN 4
+
+/**
+ * Copy constructor for the board class.
+ * @param {Board} the board to be copied
+ */
+Board::Board(const Board& board) {
+    assert(board.IsValid());
+    bool success;
+
+    try {
+        this->board_ = new int*[3];
+        for (int i = 0; i < 3; ++i)
+            this->board_[i] = new int[3];
+        success = true;
+    }
+    catch(std::bad_alloc exc) {
+        std::cerr << "ERROR: Memory allocation failed" << std::endl;
+        success = false;
+    }
+    assert(success);
+
+    for (int x = 0; x < 3; ++x) {
+        for (int y = 0; y < 3; ++y) {
+            this->board_[x][y] = board.GetValueAt(x, y);
+        }
+    }
+    this->empty_space_position_ = board.empty_space_position_;
+    this->moves_made_ = board.moves_made_;
+    this->estimated_moves_remaining_ = board.estimated_moves_remaining_;
+    this->previous_state_ = board.previous_state_;
+}
+
 
 /**
  * Returns the value of the tile at board[x][y].
@@ -17,7 +55,7 @@
  * @param {int} y The y coordinate of the point.
  * @return {int} The value of the tile at those coordinates.
  */
-const int Board::GetValueAt(int x, int y) {
+const int Board::GetValueAt(int x, int y) const {
     if (!this->board_) {
         std::cerr << "ERROR: Board has not been initialized yet.\n";
         return -1;
@@ -29,6 +67,16 @@ const int Board::GetValueAt(int x, int y) {
     return this->board_[x][y];
 }
 
+/**
+ * Checks if a board has been allocated and initialized.
+ * @return {boolean} true if board is valid.
+ */
+bool Board::IsValid() const {
+    if (!this->board_) {
+        return false;
+    }
+    return true;
+}
 
 /**
   * Allocates memory and initializes the board. 
@@ -68,7 +116,7 @@ bool Board::CreateBoard() {
 /**
  * Prints the board,
  */
-void Board::PrintBoard() {
+void Board::PrintBoard() const {
     // If the board hasn't been allocated, then can't print it.
     if (!this->board_) {
         std::cerr << "ERROR: Please make sure CreateBoard has been called.";
@@ -101,6 +149,54 @@ int Board::GetHeuristicValue() {
     return this->CalculateAndSetHeuristic_();
 }
 
+/**
+ * Moves the empty space to the right.
+ * @return {boolean} true if the move was successful, false otherwise.
+ */
+bool Board::MoveRight() {
+    if (this->GetEmptySpaceColumn() >= 2) {
+        return false;
+    }
+    this->Move_(RIGHT);
+    return true;
+}
+
+/**
+ * Moves the empty space to the left.
+ * @return {boolean} true if the move was successful, false otherwise.
+ */
+bool Board::MoveLeft() {
+    if (this->GetEmptySpaceColumn() <= 0) {
+        return false;
+    }
+    this->Move_(LEFT);
+    return true;
+}
+
+/**
+ * Moves the empty space down.
+ * @return {boolean} true if the move was successful, false otherwise.
+ */
+bool Board::MoveDown() {
+    if (this->GetEmptySpaceRow() >= 2) {
+        return false;
+    }
+    this->Move_(DOWN);
+    return true;
+}
+
+/**
+ * Moves the empty space up.
+ * @return {boolean} true if the move was successful, false otherwise.
+ */
+bool Board::MoveUp() {
+    if (this->GetEmptySpaceRow() <= 0) {
+        return false;
+    }
+    this->Move_(UP);
+    return true;
+}
+
 //////////////////////////////
 // Private helper functions //
 //////////////////////////////
@@ -117,6 +213,9 @@ void Board::DestroyBoard_() {
         }
         delete [] this->board_;
         this->board_ = NULL;
+    }
+    if (this->previous_state_) {
+        previous_state_->DestroyBoard_();
     }
 }
 
@@ -195,12 +294,66 @@ int Board::CalculateAndSetHeuristic_() {
     return value;
 }
 
-/**
- * Moves the empty space to the right.
- * @return {boolean} true if move successful, false otherwise.
- * @private
- */
-bool Board::MoveRight_() {
-    return true;
+void Board::Swap_(std::pair<int, int> point_1, std::pair<int, int> point_2) {
+    assert(point_1.first < 3 && point_1.first >= 0);
+    assert(point_1.second < 3 && point_1.second >= 0);
+    assert(point_2.first < 3 && point_2.first >= 0);
+    assert(point_2.second < 3 && point_2.second >= 0);
+    int value_at_point_1 = this->GetValueAt(point_1.first, point_1.second);
+    int value_at_point_2 = this->GetValueAt(point_2.first, point_2.second);
+    this->board_[point_1.first][point_1.second] = value_at_point_2;
+    this->board_[point_2.first][point_2.second] = value_at_point_1;
 }
 
+/**
+ * Moves the empty space to the right.
+ * NOTE: It's up to the callee to call delete on the created Board.
+ * @return {pair<boolean, Board>} first value indicates if move successful,
+ *   second value is the newly created Board after the move.
+ * @private
+ */
+
+void Board::Move_(int direction) {
+    this->previous_state_ = new Board(*this);
+
+    std::pair<int, int> current_position = this->GetEmptySpacePosition();
+    std::pair<int, int> next_position;
+    switch (direction) {
+        case RIGHT:
+            next_position = std::make_pair(current_position.first ,
+                current_position.second + 1);
+            break;
+        case LEFT:
+            next_position = std::make_pair(current_position.first ,
+                current_position.second - 1);
+            break;
+        case UP:
+            next_position = std::make_pair(current_position.first - 1 ,
+                current_position.second);
+            break;
+        case DOWN:
+            next_position = std::make_pair(current_position.first + 1 ,
+                current_position.second);
+            break;
+    }
+    this->Swap_(current_position, next_position);
+    this->moves_made_ = this->moves_made_ + 1;
+    this->empty_space_position_ = next_position;
+    this->CalculateAndSetHeuristic_();
+}
+
+//////////////////////////
+// Overloaded operators //
+//////////////////////////
+
+bool operator==(const Board& lhs, const Board& rhs) {
+    // Do an element-by-element comparision of the boards.
+    for (int x = 0; x < 3; ++x) {
+        for (int y = 0; y < 3; ++y) {
+            if (lhs.GetValueAt(x, y) != rhs.GetValueAt(x, y)) {
+                return false;
+            }
+        }
+    }
+    return true;
+}

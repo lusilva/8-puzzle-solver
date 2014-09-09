@@ -27,7 +27,13 @@ class Board {
  	 */
     explicit Board(const std::string &input) : input_string_(input),
       moves_made_(0), estimated_moves_remaining_(-1), previous_state_(NULL),
-      board_(NULL), empty_space_position_(std::make_pair(-1,-1)) {}
+      board_(NULL), empty_space_position_(std::make_pair(-1, -1)) {}
+
+    /**
+     * Copy constructor for the board class.
+     * @param {Board} the board to be copied
+     */
+    Board(const Board& board);
 
     /*
      * Destructor for the Board class. Deallocates dyanmically created memory.
@@ -37,12 +43,6 @@ class Board {
     /////////////////////////////////////
     // Getters for all private members //
     /////////////////////////////////////
-
-    /**
-     * Gets the input string used to create the table.
-     * @return {string} the input string
-     */
-    const std::string GetInputString() const {return this->input_string_;}
 
     /**
      * Gets the number of moves made so far.
@@ -65,10 +65,24 @@ class Board {
 
     /**
      * Gets the position of empty space as a pair of coordinates.
-     * @return {pair} (x,y) coordinates of the empty space.
+     * @return {pair<int, int>} (x,y) coordinates of the empty space.
      */
     const std::pair<int, int> GetEmptySpacePosition() const {
         return this->empty_space_position_;}
+
+    /**
+     * Gets the x coordinate of the empty space.
+     * @return {int} the x coordinate of the empty space.
+     */
+    const int GetEmptySpaceRow() const {
+        return this->empty_space_position_.first;}
+
+    /**
+     * Gets the y coordinate of the empty space.
+     * @return {int} the y coordinate of the empty space.
+     */
+    const int GetEmptySpaceColumn() const {
+        return this->empty_space_position_.second;}
 
     /**
      * Returns the value of the tile at board[x][y]
@@ -76,12 +90,18 @@ class Board {
      * @param {int} y The y coordinate of the point.
      * @return {int} The value of the tile at those coordinates.
      */
-    const int GetValueAt(int x, int y);
+    const int GetValueAt(int x, int y) const;
 
     ////////////////////
     // End of getters //
     ////////////////////
-    
+
+    /**
+     * Checks if a board has been allocated and initialized.
+     * @return {boolean} true if board is valid.
+     */
+    bool IsValid() const;
+
     /*
      * Allocates memory and initializes the board. 
      * Must be called after making a new board instance, because this
@@ -93,7 +113,7 @@ class Board {
     /**
      * Prints the board.
      */
-    void PrintBoard();
+    void PrintBoard() const;
 
     /**
      * Gets the value of the heuristic function.
@@ -101,7 +121,35 @@ class Board {
      */
     int GetHeuristicValue();
 
+    ///////////////////////////////////////////////////////////////
+    // Do actual moving of tiles on board.                       //
+    // All these create new boards dynamically,                  //
+    // it is the responsibility of the caller to delete them     //
+    ///////////////////////////////////////////////////////////////
 
+    /**
+     * Moves the empty space to the right.
+     * @return {boolean} true if the move was successful, false otherwise.
+     */
+    bool MoveRight();
+
+    /**
+     * Moves the empty space to the left.
+     * @return {boolean} true if the move was successful, false otherwise.
+     */
+    bool MoveLeft();
+
+    /**
+     * Moves the empty space down.
+     * @return {boolean} true if the move was successful, false otherwise.
+     */
+    bool MoveDown();
+
+    /**
+     * Moves the empty space up.
+     * @return {boolean} true if the move was successful, false otherwise.
+     */
+    bool MoveUp();
 
  private:
     /* The input string given by the user. */
@@ -123,6 +171,14 @@ class Board {
     /* Allocates dynamic memory used to store the board. */
     bool AllocateBoard_();
 
+    /* Sets the x position of the blank space on the board */
+    void SetEmptySpaceXCoordinate_(int x) {
+        this->empty_space_position_.first = x;}
+
+    /* Sets the y position of the blank space on the board */
+    void SetEmptySpaceYCoordinate_(int y) {
+        this->empty_space_position_.second = y;}
+
     /* Removes all spaces from input string */
     std::string TrimSpaceFromInputString_();
 
@@ -136,34 +192,25 @@ class Board {
      * Recalculates the heuristic function, which estimates how many
      *   moves remain to get to goal state.
      *   Also sets estimated_moves_remaining_;
+     * @private
      */
     int CalculateAndSetHeuristic_();
 
     /**
-     * Move the empty space to the right.
-     * Returns true if move successful, false otherwise.
+     * Swaps the values of two coordinates on the board with each other.
+     * @param {pair<int, int>} The first point.
+     * @param {pair<int, int>} The second point.
+     * @private
      */
-    bool MoveRight_();
+    void Swap_(std::pair<int, int> point_1, std::pair<int, int> point_2);
 
     /**
-     * Move the empty space to the left.
-     * Returns true if move successful, false otherwise.
+     * Actually moves the white space on the board.
+     * @param {int} direction The direction of the move.
      */
-    bool MoveLeft_();
-
-    /**
-     * Move the empty space up.
-     * Returns true if move successful, false otherwise.
-     */
-    bool MoveUp_();
-
-    /**
-     * Move the empty space down.
-     * Returns true if move successful, false otherwise.
-     */
-    bool MoveDown_();
+    void Move_(int direction);
 };
 
-
+bool operator==(const Board& lhs, const Board& rhs);
 
 #endif

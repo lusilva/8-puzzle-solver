@@ -8,11 +8,21 @@
 #include "headers/board.h"
 
 int main() {
-    Board board = Board("1 0 2 3 4 5 6 7 8");
-    board.PrintBoard();
-    if (board.CreateBoard()) {
-        board.PrintBoard();
-        std::cout << board.GetHeuristicValue() << std::endl;
+    Board* board = new Board("1 0 2 3 4 5 6 7 8");
+    if (board->CreateBoard()) {
+        board->PrintBoard();
+        std::cout << board->GetHeuristicValue() << std::endl;
     }
+    Board* new_board = new Board(*board);
+
+    new_board->MoveRight();
+    std::cout << "OLD BOARD" << std::endl;
+    board->PrintBoard();
+    std::cout << "NEW BOARD" << std::endl;
+    new_board->PrintBoard();
+    new_board->GetPreviousState()->PrintBoard();
+
+    delete board;
+    delete new_board;
     return 1;
 }
