@@ -129,10 +129,9 @@ Board* Solve(std::priority_queue<Board*, std::vector<Board*>,
         if (result.first) {
             return result.second;
         }
-        
+
         pq.pop();
         to_delete.push_back(board);
-
     }
 
     // No goal state was found!
@@ -155,6 +154,25 @@ void Cleanup(std::priority_queue<Board*, std::vector<Board*>,
     }
 }
 
+/**
+ * Gets the initial board from the user.
+ * @return {Board*} The constructed board.
+ */
+Board* GetBoardFromUser() {
+    std::cout << std::endl;
+    std::cout << "Please enter the puzzle state formatted as one string," << std::endl;
+    std::cout << "starting from the top left and going to the bottom right of the table" << std::endl;
+    std::cout << "example: goal state would be '1 2 3 4 5 6 7 8 0'" << std::endl;
+    
+    std::cout << std::endl;
+
+    std::string input;
+    std::cout << "Enter board string: " << std::endl;
+    std::getline(std::cin, input);
+
+    return new Board(input);
+}
+
 ///////////////////
 // Start of main //
 ///////////////////
@@ -164,14 +182,17 @@ int main() {
     std::priority_queue<Board*, std::vector<Board*>, QueueCompareClass> pq;
 
     std::vector<Board*> to_delete;
-
+   
     // Create a board object from the input string.
-    Board* board = new Board("4 7 2 5 8 1 3 6 0");
+    Board* board = GetBoardFromUser();
+
     if (board->CreateBoard()) {
+        if (board->IsAtGoalState()) {
+            std::cout << "Looks like board is already at the goal state!" << std::endl;
+            return 1;
+        }
         // Add the board to the queue.
         pq.push(board);
-        std::cout << "Pushed initial board" << std::endl;
-        board->PrintBoard();
     } else {
         std::cerr << "Board could not be created!" << std::endl;
         return 1;
@@ -179,10 +200,11 @@ int main() {
 
     Board* answer = Solve(pq, to_delete);
     if (!answer) {
-        std::cout << "COULD NOT FIND SOLUTION" << std::endl;
+        std::cerr << "Could not find solution" << std::endl;
         return 1;
     }
 
+    std::cout << std::endl << "SOLUTION: " << std::endl << std::endl;
     answer->DisplayAllSteps();
 
     Cleanup(pq, to_delete);

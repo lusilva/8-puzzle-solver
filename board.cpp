@@ -162,15 +162,32 @@ void Board::DisplayAllSteps() {
 
     int number_of_boards = all_boards.size() - 1;
     for (int i = number_of_boards; i > -1; --i) {
+        assert(all_boards[i]->IsValid());
+
         if (number_of_boards - i == 0) {
             std::cout << "INITIAL BOARD" << std::endl;
         } else if (i == 0) {
             std::cout << "GOAL STATE" << std::endl;
         } else {
-            std::cout << "STEP: " << number_of_boards - i << std::endl;
+            std::cout << "MOVE: " << all_boards[i]->GetMovesMade() << " - ";
+
+            switch(all_boards[i]->direction_moved_) {
+                case RIGHT:
+                    std::cout << "move right" << std::endl;
+                    break;
+                case LEFT:
+                    std::cout << "move left" << std::endl;
+                    break;
+                case UP:
+                    std::cout << "move up" << std::endl;
+                    break;
+                case DOWN:
+                    std::cout << "move down" << std::endl;
+                    break;
+            }
         }
-        assert(all_boards[i]->IsValid());
         all_boards[i]->PrintBoard();
+        std::cout << std::endl;
     }
 }
 
@@ -209,6 +226,7 @@ bool Board::MoveRight() {
         return false;
     }
     this->Move_(RIGHT);
+    this->direction_moved_ = RIGHT;
     return true;
 }
 
@@ -232,6 +250,7 @@ bool Board::MoveLeft() {
         return false;
     }
     this->Move_(LEFT);
+    this->direction_moved_ = LEFT;
     return true;
 }
 
@@ -255,6 +274,7 @@ bool Board::MoveDown() {
         return false;
     }
     this->Move_(DOWN);
+    this->direction_moved_ = DOWN;
     return true;
 }
 
@@ -278,6 +298,7 @@ bool Board::MoveUp() {
         return false;
     }
     this->Move_(UP);
+    this->direction_moved_ = UP;
     return true;
 }
 

@@ -14,6 +14,7 @@
     Below is a list of its private data members and their default value:
         - {string}         input_string_                  -> initialized to user input
         - {int}            moves_made_                    -> initialized to zero
+        - {int}            direction_moved_               -> initialized to -1
         - {int}            estimated_moves_remaining_     -> initialized to -1
         - {int}            previous_state_                -> initialized to NULL
         - {int**}          board                          -> initialized to NULL
@@ -26,7 +27,7 @@ class Board {
  	 * @param {string} input The user input
  	 */
     explicit Board(const std::string &input) : input_string_(input),
-      moves_made_(0), estimated_moves_remaining_(-1), previous_state_(NULL),
+      moves_made_(0), direction_moved_(-1), estimated_moves_remaining_(-1), previous_state_(NULL),
       board_(NULL), empty_space_position_(std::make_pair(-1, -1)) {}
 
     /**
@@ -103,9 +104,9 @@ class Board {
     ////////////////////
     // End of getters //
     ////////////////////
-    
+
     /* Sets the pointer to the previous board state */
-    void SetPreviousState(Board* &prev) {this->previous_state_=prev;}
+    void SetPreviousState(Board* &prev) {this->previous_state_ = prev;}
 
     /**
      * Checks if a board has been allocated and initialized.
@@ -117,7 +118,7 @@ class Board {
      * Checks if the board is at the goal state.
      * @return {boolean} true if board is at goal state.
      */
-    bool IsAtGoalState() {return this->estimated_moves_remaining_ == 0;}
+    bool IsAtGoalState() const {return this->estimated_moves_remaining_ == 0;}
 
     /*
      * Allocates memory and initializes the board. 
@@ -209,6 +210,8 @@ class Board {
     int moves_made_;
     /* Estimated moves remaining, using heuristic function. */
     int estimated_moves_remaining_;
+    /* Stores the direction that the board was moved */
+    int direction_moved_;
     /* A pointer to the previous board state. */
     Board* previous_state_;
 
