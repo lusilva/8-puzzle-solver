@@ -103,6 +103,9 @@ class Board {
     ////////////////////
     // End of getters //
     ////////////////////
+    
+    /* Sets the pointer to the previous board state */
+    void SetPreviousState(Board* &prev) {this->previous_state_=prev;}
 
     /**
      * Checks if a board has been allocated and initialized.

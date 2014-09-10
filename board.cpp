@@ -42,7 +42,7 @@ Board::Board(const Board& board) {
     this->empty_space_position_ = board.empty_space_position_;
     this->moves_made_ = board.moves_made_;
     this->estimated_moves_remaining_ = board.estimated_moves_remaining_;
-    this->previous_state_ = board.previous_state_;
+    this->previous_state_ = NULL;
 
     assert(this->board_);
 }
@@ -72,6 +72,9 @@ const int Board::GetValueAt(int x, int y) const {
  * @return {boolean} true if board is valid.
  */
 bool Board::IsValid() const {
+    if (!this) {
+        return false;
+    }
     if (!this->board_) {
         return false;
     }
@@ -128,7 +131,11 @@ void Board::PrintBoard() const {
         std::cout << "|";
         for (int y = 0; y < 3; ++y) {
             std::cout << " ";
-            std::cout << this->board_[x][y];
+            if (this->board_[x][y] == 0) {
+                std::cout << " ";
+            } else {
+                std::cout << this->board_[x][y];
+            }
             std::cout << " ";
         }
         std::cout << "|\n";
@@ -160,8 +167,9 @@ void Board::DisplayAllSteps() {
         } else if (i == 0) {
             std::cout << "GOAL STATE" << std::endl;
         } else {
-            std::cout << "STEP: " << number_of_boards << std::endl;
+            std::cout << "STEP: " << number_of_boards - i << std::endl;
         }
+        assert(all_boards[i]->IsValid());
         all_boards[i]->PrintBoard();
     }
 }
@@ -290,9 +298,6 @@ void Board::DestroyBoard_() {
         delete [] this->board_;
         this->board_ = NULL;
     }
-    if (this->previous_state_) {
-        previous_state_->DestroyBoard_();
-    }
 }
 
 /**
@@ -346,8 +351,8 @@ int Board::CalculateSumOfManhattanDistances_() {
         for (int y = 0; y < 3; ++y) {
             int value = this->board_[x][y];
             if (value != 0) {
-                int targetX = (value) / 3;
-                int targetY = (value) % 3;
+                int targetX = (value - 1) / 3;
+                int targetY = (value - 1) % 3;
                 int dx = x - targetX;
                 int dy = y - targetY;
                 manhattanDistanceSum += std::abs(dx) + std::abs(dy);
@@ -391,8 +396,6 @@ void Board::Swap_(std::pair<int, int> point_1, std::pair<int, int> point_2) {
  */
 
 void Board::Move_(int direction) {
-    this->previous_state_ = new Board(*this);
-
     std::pair<int, int> current_position = this->GetEmptySpacePosition();
     std::pair<int, int> next_position;
     switch (direction) {
@@ -417,11 +420,6 @@ void Board::Move_(int direction) {
     this->moves_made_ = this->moves_made_ + 1;
     this->empty_space_position_ = next_position;
     this->CalculateAndSetHeuristic_();
-
-    std::cout << "PREVIOUS!" << std::endl;
-    this->previous_state_->PrintBoard();
-    std::cout << "CURRENT" << std::endl;
-    this->PrintBoard();
 }
 
 //////////////////////////
