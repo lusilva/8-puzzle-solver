@@ -1,14 +1,12 @@
 /////////////////////////////////////////////////
-// Copyright 2014 Lucas Silva                  //
 // The main file in the program                //
 /////////////////////////////////////////////////
-
-// TODO(lucas): Implement IO
 
 #include <iostream>
 #include <queue>          // std::priority_queue
 #include <vector>         // std::vector
 #include <utility>
+#include <string>
 
 #include "headers/board.h"
 
@@ -160,10 +158,14 @@ void Cleanup(std::priority_queue<Board*, std::vector<Board*>,
  */
 Board* GetBoardFromUser() {
     std::cout << std::endl;
-    std::cout << "Please enter the puzzle state formatted as one string," << std::endl;
-    std::cout << "starting from the top left and going to the bottom right of the table" << std::endl;
-    std::cout << "example: goal state would be '1 2 3 4 5 6 7 8 0'" << std::endl;
-    
+    std::cout << "DIRECTIONS: " << std::endl; 
+    std::cout << "Please enter the puzzle board a single string," << std::endl;
+    std::cout << "starting from the top left and going to" << std::endl;
+    std::cout << "the bottom right of the table." << std::endl;
+    std::cout << std::endl;
+    std::cout << "ex: goal state would be '1 2 3 4 5 6 7 8 0'" << std::endl;
+    std::cout << "(with or without spaces between numbers)" << std::endl;
+
     std::cout << std::endl;
 
     std::string input;
@@ -182,13 +184,14 @@ int main() {
     std::priority_queue<Board*, std::vector<Board*>, QueueCompareClass> pq;
 
     std::vector<Board*> to_delete;
-   
+
     // Create a board object from the input string.
     Board* board = GetBoardFromUser();
 
     if (board->CreateBoard()) {
         if (board->IsAtGoalState()) {
-            std::cout << "Looks like board is already at the goal state!" << std::endl;
+            std::cout << "Looks like board is already at the goal state!";
+            std::cout << std::endl;
             return 1;
         }
         // Add the board to the queue.
@@ -197,18 +200,20 @@ int main() {
         std::cerr << "Board could not be created!" << std::endl;
         return 1;
     }
-
+    
+    // Acutally solve the puzzle
     Board* answer = Solve(pq, to_delete);
     if (!answer) {
         std::cerr << "Could not find solution" << std::endl;
         return 1;
     }
-
+   
+    // Display step-by-step solution
     std::cout << std::endl << "SOLUTION: " << std::endl << std::endl;
     answer->DisplayAllSteps();
 
+    // Delete all dynamically allocated memory.
     Cleanup(pq, to_delete);
-
 
     return 0;
 }

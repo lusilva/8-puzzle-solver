@@ -170,19 +170,20 @@ void Board::DisplayAllSteps() {
             std::cout << "GOAL STATE" << std::endl;
         } else {
             std::cout << "MOVE: " << all_boards[i]->GetMovesMade() << " - ";
-
-            switch(all_boards[i]->direction_moved_) {
+            
+            // Print out the direction of the move
+            switch (all_boards[i]->direction_moved_) {
                 case RIGHT:
-                    std::cout << "move right" << std::endl;
+                    std::cout << "moved right" << std::endl;
                     break;
                 case LEFT:
-                    std::cout << "move left" << std::endl;
+                    std::cout << "moved left" << std::endl;
                     break;
                 case UP:
-                    std::cout << "move up" << std::endl;
+                    std::cout << "moved up" << std::endl;
                     break;
                 case DOWN:
-                    std::cout << "move down" << std::endl;
+                    std::cout << "moved down" << std::endl;
                     break;
             }
         }
@@ -401,7 +402,7 @@ void Board::Swap_(std::pair<int, int> point_1, std::pair<int, int> point_2) {
     assert(point_1.second < 3 && point_1.second >= 0);
     assert(point_2.first < 3 && point_2.first >= 0);
     assert(point_2.second < 3 && point_2.second >= 0);
-    
+
     int value_at_point_1 = this->GetValueAt(point_1.first, point_1.second);
     int value_at_point_2 = this->GetValueAt(point_2.first, point_2.second);
     this->board_[point_1.first][point_1.second] = value_at_point_2;

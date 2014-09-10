@@ -27,8 +27,9 @@ class Board {
  	 * @param {string} input The user input
  	 */
     explicit Board(const std::string &input) : input_string_(input),
-      moves_made_(0), direction_moved_(-1), estimated_moves_remaining_(-1), previous_state_(NULL),
-      board_(NULL), empty_space_position_(std::make_pair(-1, -1)) {}
+      moves_made_(0), direction_moved_(-1), estimated_moves_remaining_(-1),
+      previous_state_(NULL), board_(NULL),
+      empty_space_position_(std::make_pair(-1, -1)) {}
 
     /**
      * Copy constructor for the board class.
