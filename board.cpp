@@ -1,4 +1,5 @@
-/////////////////////////////////////////////////                //
+/////////////////////////////////////////////////
+// Assignment 1 : Lucas Silva                  //
 // The implementation file for the board class //
 /////////////////////////////////////////////////
 
@@ -523,7 +524,6 @@ bool operator==(const Board& lhs, const Board& rhs) {
     return true;
 }
 
-// TODO(Lucas): Deal with ties in rank.
 bool operator<(const Board &lhs, const Board &rhs) {
     return lhs.GetRank() > rhs.GetRank();
 }

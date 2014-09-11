@@ -1,4 +1,5 @@
 /////////////////////////////////////////////////
+// Assignment 1 : Lucas Silva                  //
 // The main file in the program                //
 /////////////////////////////////////////////////
 
@@ -158,7 +159,7 @@ void Cleanup(std::priority_queue<Board*, std::vector<Board*>,
  */
 Board* GetBoardFromUser() {
     std::cout << std::endl;
-    std::cout << "DIRECTIONS: " << std::endl; 
+    std::cout << "DIRECTIONS: " << std::endl;
     std::cout << "Please enter the puzzle board a single string," << std::endl;
     std::cout << "starting from the top left and going to" << std::endl;
     std::cout << "the bottom right of the table." << std::endl;
@@ -200,14 +201,14 @@ int main() {
         std::cerr << "Board could not be created!" << std::endl;
         return 1;
     }
-    
+
     // Acutally solve the puzzle
     Board* answer = Solve(pq, to_delete);
     if (!answer) {
         std::cerr << "Could not find solution" << std::endl;
         return 1;
     }
-   
+
     // Display step-by-step solution
     std::cout << std::endl << "SOLUTION: " << std::endl << std::endl;
     answer->DisplayAllSteps();
