@@ -13,12 +13,12 @@
 
 #include "headers/board.h"
 
-#define RIGHT 1
-#define LEFT 2
-#define UP 3
-#define DOWN 4
-#define TOP_LEFT 5
-#define BOTTOM_RIGHT 6
+#define RIGHT 1           // Represents a move to the right
+#define LEFT 2            // Represents a move to the left
+#define UP 3              // Represents a move up
+#define DOWN 4            // Represents a move down
+#define TOP_LEFT 5        // Represents a goal state with empty space at top left
+#define BOTTOM_RIGHT 6    // Represents a goal state with empty space at bottom right
 
 /**
  * Copy constructor for the board class.
@@ -100,6 +100,14 @@ bool Board::CreateBoard() {
         this->DestroyBoard_();
         return false;
     }
+    // Array used to check for duplicate numbers. All entries
+    // are initialized to zero, and as the numbers are read their 
+    // index in the array is made true.
+    bool check_for_duplicates_array[9];
+    for (int i = 0; i < 9; ++i) {
+        check_for_duplicates_array[i] = false;
+    }
+
     // Actually fill in the tile values.
     for (int tile = 0; tile < input.length(); tile++) {
         // Convert the char to int and set it to that position in board.
@@ -109,6 +117,13 @@ bool Board::CreateBoard() {
             this->DestroyBoard_();
             return false;
         }
+        // Check for duplicate numbers.
+        if (check_for_duplicates_array[tile_number]) {
+            std::cerr << "ERROR: Tiles must be unique! \n";
+            this->DestroyBoard_();
+            return false;
+        }
+        check_for_duplicates_array[tile_number] = true;
         this->board_[tile/3][tile%3] = tile_number;
         // If this is the empty space, store its current position on the board.
         if (tile_number == 0) {
@@ -178,7 +193,7 @@ void Board::DisplayAllSteps() {
             std::cout << "GOAL STATE" << std::endl;
         } else {
             std::cout << "MOVE: " << all_boards[i]->GetMovesMade() << " - ";
-            
+
             // Print out the direction of the move
             switch (all_boards[i]->direction_moved_) {
                 case RIGHT:
@@ -439,8 +454,10 @@ int Board::CalculateSumOfManhattanDistancesBottom_() {
  * @private
  */
 void Board::DetermineGoalState_() {
-    int bottom_goal_state_heuristic = this->CalculateSumOfManhattanDistancesBottom_();
-    int top_goal_state_heuristic = this->CalculateSumOfManhattanDistancesTop_();
+    int bottom_goal_state_heuristic = 
+        this->CalculateSumOfManhattanDistancesBottom_();
+    int top_goal_state_heuristic = 
+        this->CalculateSumOfManhattanDistancesTop_();
     if (bottom_goal_state_heuristic < top_goal_state_heuristic) {
         this->goal_state_type_ = BOTTOM_RIGHT;
     } else {
@@ -461,6 +478,11 @@ int Board::CalculateAndSetHeuristic_() {
     return value;
 }
 
+/**
+ * Swaps two values given their positions in the table. Used by move function.
+ * @param point_1 one of the points to move
+ * @param point_2 the second point to move
+ */
 void Board::Swap_(std::pair<int, int> point_1, std::pair<int, int> point_2) {
     assert(point_1.first < 3 && point_1.first >= 0);
     assert(point_1.second < 3 && point_1.second >= 0);
@@ -475,12 +497,10 @@ void Board::Swap_(std::pair<int, int> point_1, std::pair<int, int> point_2) {
 
 /**
  * Moves the empty space to the right.
- * NOTE: It's up to the callee to call delete on the created Board.
  * @return {pair<boolean, Board>} first value indicates if move successful,
  *   second value is the newly created Board after the move.
  * @private
  */
-
 void Board::Move_(int direction) {
     std::pair<int, int> current_position = this->GetEmptySpacePosition();
     std::pair<int, int> next_position;

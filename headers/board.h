@@ -18,7 +18,8 @@
         - {int}            direction_moved_               -> initialized to -1
         - {int}            estimated_moves_remaining_     -> initialized to -1
         - {int}            previous_state_                -> initialized to NULL
-        - {int**}          board                          -> initialized to NULL
+        - {int**}          board_                         -> initialized to NULL
+        - {int}            goal_state_type_               -> initialized to -1
         - {pair<int, int>} empty_space_position_          -> initialized to (-1,-1) 
 */
 class Board {
@@ -146,13 +147,6 @@ class Board {
      */
     int GetHeuristicValue();
 
-    ///////////////////////////////////////////////////////////////
-    // Do actual moving of tiles on board.                       //
-    // All these create new boards dynamically,                  //
-    // it is the responsibility of the caller to delete them     //
-    ///////////////////////////////////////////////////////////////
-
-
     /**
      * Determine whether a move to the right is possible.
      * @return {boolean} true if possible.
@@ -239,11 +233,22 @@ class Board {
     /*
      * Calculates the sum of all manhattan distances of every piece on the board.
      * This is the heuristic function used for the A* algorithm.
+     * @return the sum of the manhattan distances.
      */
     int CalculateSumOfManhattanDistances_();
 
+    /**
+     * Calculates the manhattan distance with the goal state represented by
+     * the empty state at the top left.
+     * @return the sum of the manhattan distances.
+     */
     int CalculateSumOfManhattanDistancesTop_();
 
+    /**
+     * Calculates the manhattan distance with the goal state represented by
+     * the empty state at the bottom right.
+     * @return the sum of the manhattan distances.
+     */
     int CalculateSumOfManhattanDistancesBottom_();
 
     /**
