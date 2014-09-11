@@ -28,7 +28,7 @@ class Board {
  	 */
     explicit Board(const std::string &input) : input_string_(input),
       moves_made_(0), direction_moved_(-1), estimated_moves_remaining_(-1),
-      previous_state_(NULL), board_(NULL),
+      previous_state_(NULL), board_(NULL), goal_state_type_(-1),
       empty_space_position_(std::make_pair(-1, -1)) {}
 
     /**
@@ -213,6 +213,8 @@ class Board {
     int estimated_moves_remaining_;
     /* Stores the direction that the board was moved */
     int direction_moved_;
+    /* Stores the type of the goal state, top left versus bottom right */
+    int goal_state_type_;
     /* A pointer to the previous board state. */
     Board* previous_state_;
 
@@ -239,6 +241,10 @@ class Board {
      */
     int CalculateSumOfManhattanDistances_();
 
+    int CalculateSumOfManhattanDistancesTop_();
+
+    int CalculateSumOfManhattanDistancesBottom_();
+
     /**
      * Recalculates the heuristic function, which estimates how many
      *   moves remain to get to goal state.
@@ -258,8 +264,16 @@ class Board {
     /**
      * Actually moves the white space on the board.
      * @param {int} direction The direction of the move.
+     * @private
      */
     void Move_(int direction);
+
+    /**
+     * Determines the goal state can be reached in the least 
+     * number of moves using the heuristic.
+     * @private
+     */
+    void DetermineGoalState_();
 };
 
 /**

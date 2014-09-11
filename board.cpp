@@ -16,6 +16,8 @@
 #define LEFT 2
 #define UP 3
 #define DOWN 4
+#define TOP_LEFT 5
+#define BOTTOM_RIGHT 6
 
 /**
  * Copy constructor for the board class.
@@ -43,6 +45,7 @@ Board::Board(const Board& board) {
     this->moves_made_ = board.moves_made_;
     this->estimated_moves_remaining_ = board.estimated_moves_remaining_;
     this->previous_state_ = NULL;
+    this->goal_state_type_ = board.goal_state_type_;
 
     assert(this->board_);
 }
@@ -111,7 +114,11 @@ bool Board::CreateBoard() {
             this->empty_space_position_ = std::make_pair(tile/3, tile%3);
         }
     }
-    // Initialize the heuristic value.
+    // Determine if goal state should be with blank space
+    // at the top left or at the bottom right, depending
+    // on whichever one has a lower heuristic value.
+    this->DetermineGoalState_();
+
     this->CalculateAndSetHeuristic_();
     return true;
 }
@@ -368,6 +375,46 @@ std::string Board::TrimSpaceFromInputString_() {
   * @return {int} The sum of the manhattan distances.
   */
 int Board::CalculateSumOfManhattanDistances_() {
+    if (this->goal_state_type_ == TOP_LEFT) {
+        return this->CalculateSumOfManhattanDistancesTop_();
+    } else if (this->goal_state_type_ == BOTTOM_RIGHT) {
+        return this->CalculateSumOfManhattanDistancesBottom_();
+    } else {
+        std::cerr << "Invalid goal state type!" << std::endl;
+        exit(1);
+    }
+}
+
+/**
+ * Calculates sum of the manhattan distances of every piece, using
+ * the empty square at the top right as the goal state.
+ * @return {int} The sum of the manhattan distances.
+ * @private
+ */
+int Board::CalculateSumOfManhattanDistancesTop_() {
+    int manhattanDistanceSum = 0;
+    for (int x = 0; x < 3; ++x) {
+        for (int y = 0; y < 3; ++y) {
+            int value = this->board_[x][y];
+            if (value != 0) {
+                int targetX = (value) / 3;
+                int targetY = (value) % 3;
+                int dx = x - targetX;
+                int dy = y - targetY;
+                manhattanDistanceSum += std::abs(dx) + std::abs(dy);
+            }
+        }
+    }
+    return manhattanDistanceSum;
+}
+
+/**
+ * Calculates sum of the manhattan distances of every piece, using
+ * the empty square at the bottom left as the goal state.
+ * @return {int} The sum of the manhattan distances.
+ * @private
+ */
+int Board::CalculateSumOfManhattanDistancesBottom_() {
     int manhattanDistanceSum = 0;
     for (int x = 0; x < 3; ++x) {
         for (int y = 0; y < 3; ++y) {
@@ -382,6 +429,22 @@ int Board::CalculateSumOfManhattanDistances_() {
         }
     }
     return manhattanDistanceSum;
+}
+
+/**
+ * Determines what the goal state should be, empty position at 
+ * top left or empty positin at bottom right, depending on 
+ * whichever one yields the lowest manhattan distance.
+ * @private
+ */
+void Board::DetermineGoalState_() {
+    int bottom_goal_state_heuristic = this->CalculateSumOfManhattanDistancesBottom_();
+    int top_goal_state_heuristic = this->CalculateSumOfManhattanDistancesTop_();
+    if (bottom_goal_state_heuristic < top_goal_state_heuristic) {
+        this->goal_state_type_ = BOTTOM_RIGHT;
+    } else {
+        this->goal_state_type_ = TOP_LEFT;
+    }
 }
 
 /**
