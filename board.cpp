@@ -44,6 +44,7 @@ Board::Board(const Board& board) {
     }
     this->empty_space_position_ = board.empty_space_position_;
     this->moves_made_ = board.moves_made_;
+    this->input_string_ = board.input_string_;
     this->estimated_moves_remaining_ = board.estimated_moves_remaining_;
     this->previous_state_ = NULL;
     this->goal_state_type_ = board.goal_state_type_;
@@ -101,7 +102,7 @@ bool Board::CreateBoard() {
         return false;
     }
     // Array used to check for duplicate numbers. All entries
-    // are initialized to zero, and as the numbers are read their 
+    // are initialized to zero, and as the numbers are read their
     // index in the array is made true.
     bool check_for_duplicates_array[9];
     for (int i = 0; i < 9; ++i) {
@@ -226,6 +227,36 @@ int Board::GetHeuristicValue() {
         return -1;
     }
     return this->CalculateAndSetHeuristic_();
+}
+
+/**
+ * Determines if the board is solvable, given the initial configuration.
+ * @return {boolean} true if solvable, false otherwise.
+ */
+bool Board::IsSolvable() {
+    // If the number of inversions needed to solve the 
+    // problem is even, then it is solvable. Otherwise it is 
+    // not. Explanation can be found here:
+    // http://ldc.usb.ve/~gpalma/ci2693sd08/puzzleFactible.txt
+    int number_of_inversions = 0;
+    std::string input = this->TrimSpaceFromInputString_();
+    for (unsigned int i = 1; i < input.length(); ++i) {
+        int current_number = input[i] - '0';
+        if (current_number == 0) {
+            continue;
+        }
+        for (int j = i - 1; j > -1; --j) {
+            int previous_number = input[j] - '0';
+            if (previous_number > current_number) {
+                ++number_of_inversions;
+            }
+        }
+    }
+    if (number_of_inversions%2 == 0) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 
@@ -454,9 +485,9 @@ int Board::CalculateSumOfManhattanDistancesBottom_() {
  * @private
  */
 void Board::DetermineGoalState_() {
-    int bottom_goal_state_heuristic = 
+    int bottom_goal_state_heuristic =
         this->CalculateSumOfManhattanDistancesBottom_();
-    int top_goal_state_heuristic = 
+    int top_goal_state_heuristic =
         this->CalculateSumOfManhattanDistancesTop_();
     if (bottom_goal_state_heuristic < top_goal_state_heuristic) {
         this->goal_state_type_ = BOTTOM_RIGHT;

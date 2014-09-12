@@ -148,6 +148,12 @@ class Board {
     int GetHeuristicValue();
 
     /**
+     * Determines if the board is solvable.
+     * @return {boolean} true if solvable, false otherwise.
+     */
+    bool IsSolvable();
+
+    /**
      * Determine whether a move to the right is possible.
      * @return {boolean} true if possible.
      */

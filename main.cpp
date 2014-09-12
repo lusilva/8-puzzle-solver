@@ -195,6 +195,10 @@ int main() {
             std::cout << std::endl;
             return 1;
         }
+        if (!board->IsSolvable()) {
+            std::cout << "This board is not solvable" << std::endl;
+            return 1;
+        }
         // Add the board to the queue.
         pq.push(board);
     } else {
